@@ -2,7 +2,7 @@ import useSWR from "swr";
 import fetcher from "../lib/fetcher";
 
 const useFavorites = () => {
-  const { data, error, isLoadding, mutate } = useSWR(
+  const { data, error, isLoading, mutate } = useSWR(
     "/api/favorites",
     fetcher,
     {
@@ -14,7 +14,7 @@ const useFavorites = () => {
   return {
     data,
     error,
-    isLoadding,
+    isLoading,
     mutate,
   };
 };

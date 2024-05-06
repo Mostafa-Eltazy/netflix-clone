@@ -13,8 +13,11 @@ export default async function handler(
   try {
     await serverAuth(req);
     const { id } = req.query;
-    const movie = await client.movie.findUnique({ where: { id: id } });
-    return res.status(200).json(movie);
+    if (id && typeof id === "string"){
+      const movie = await client.movie.findUnique({ where: { id: id } });
+      return res.status(200).json(movie);
+    }
+    return res.status(400).end();
   } catch (error) {
     return res.status(500).end();
   }
