@@ -5,9 +5,8 @@ import client from "./prismadb";
 
 const serverAuth = async (req: NextApiRequest) => {
   const session = await getSession({ req });
-
   if (!session?.user?.email) {
-    throw new Error("Not signed in");
+    throw new Error("Not signed in 1");
   }
 
   const currentUser = await client.user.findUnique({
@@ -17,7 +16,7 @@ const serverAuth = async (req: NextApiRequest) => {
   });
 
   if (!currentUser) {
-    throw new Error("Not signed In");
+    throw new Error("Not signed In 2");
   }
 
   return { currentUser };

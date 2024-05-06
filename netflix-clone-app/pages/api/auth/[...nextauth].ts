@@ -50,7 +50,6 @@ export default NextAuth({
         if (!isCorrectPassword) {
           throw new Error("Invalid password");
         }
-        console.log("user", user);
         return user;
       },
     }),

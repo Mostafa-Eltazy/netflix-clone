@@ -1,6 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { without } from "lodash";
-import serverAuth from "../../lib/serverAuth";
 import client from "../../lib/prismadb";
 
 export default async function handler(
@@ -9,17 +8,19 @@ export default async function handler(
 ) {
   try {
     if (req.method === "POST") {
-      const { currentUser } = await serverAuth(req);
-      const { movieId } = req.body;
-      const existingMovie = await client.movie
-        .findUnique({})
-        .where({ id: movieId });
+      const {
+        data: { movieId, usermail },
+      } = req.body;
+      const existingMovie = await client.movie.findUnique({
+        where: { id: movieId },
+      });
+
       if (!existingMovie) {
         throw new Error("invalid Id");
       }
 
       const user = await client.user.update({
-        where: { email: currentUser.email || "" },
+        where: { email: usermail || "" },
         data: {
           favoriteIds: {
             push: movieId,
@@ -28,21 +29,28 @@ export default async function handler(
       });
       return res.status(200).json(user);
     }
-    if (req.method === "DELETE") {
-      const { currentUser } = await serverAuth(req);
-      const { movieId } = req.body;
+    if (req.method === "PUT") {
+      console.log("PUT", req.body.data);
+      const {
+        data: { movieId, usermail, currentFavorites },
+      } = req.body;
+
       const existingMovie = await client.movie.findUnique({
         where: { id: movieId },
       });
+
       if (!existingMovie) {
         throw new Error("invalid Id");
       }
-
-      const updatedFavoriteIds = without(currentUser.favoriteIds, movieId);
+      console.log("currentFavorites", currentFavorites);
+      const updatedFavoriteIds = without(currentFavorites, movieId);
+      console.log("updatedFavoriteIds", updatedFavoriteIds);
       const updatedUser = await client.user.update({
-        where: { email: currentUser.email || "" },
+        where: { email: usermail || "" },
         data: {
-          push: { favoriteIds: updatedFavoriteIds },
+          favoriteIds: {
+            set: currentFavorites.filter((id: any) => id !== movieId),
+          },
         },
       });
 
